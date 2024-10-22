@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signInStart,signInFailure,signInSuccess } from "../redux/user/userSlice";
+import Oauth from "../components/Oauth";
 
 function Signin() {
   const [formData, setFormData] = useState({});
@@ -62,10 +63,11 @@ function Signin() {
           />
           <button
             disabled={loading}
-            className="outline-none p-2 rounded-md text-white bg-slate-700 hover:opacity-95 disabled:opacity-80"
+            className="outline-none p-2 rounded-md text-white bg-slate-700 hover:opacity-95 disabled:opacity-80 uppercase"
           >
             {loading ? "Loading..." : "Sign Up"}
           </button>
+          <Oauth/>
         </form>
         {error && <p className="text-red-600 my-2 font-semibold">{error}</p>}
         <div className="mt-4">
