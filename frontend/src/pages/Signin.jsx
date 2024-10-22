@@ -65,7 +65,7 @@ function Signin() {
             disabled={loading}
             className="outline-none p-2 rounded-md text-white bg-slate-700 hover:opacity-95 disabled:opacity-80 uppercase"
           >
-            {loading ? "Loading..." : "Sign Up"}
+            {loading ? "Loading..." : "Sign In"}
           </button>
           <Oauth/>
         </form>
