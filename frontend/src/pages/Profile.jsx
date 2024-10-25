@@ -66,7 +66,7 @@ function Profile() {
         />
         <p className="text-center text-sm">
           {fileError ? (
-            <span className="text-red-700">Error in image upload</span>
+            <span className="text-red-700">Error in image upload.  Image  must be less than 2mb</span>
           ) : filePercentage > 0 && filePercentage < 100 ? (
             <span className="text-slate-700">Uploading {filePercentage}%</span>
           ) : filePercentage === 100 ? (
