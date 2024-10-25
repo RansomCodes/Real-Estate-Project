@@ -8,14 +8,22 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
+import {
+  updateUserFailure,
+  updateUserStart,
+  updateUserSuccess
+} from "../redux/user/userSlice";
+import { useDispatch } from "react-redux";
 
 function Profile() {
-  const currentUser = useSelector((state) => state.user.user.currentUser);
+  const { currentUser, loading, error } = useSelector((state) => state.user.user);
   const fileRef = useRef(null);
   const [file, setFile] = useState(undefined);
   const [filePercentage, setFilePercentage] = useState(0);
   const [fileError, setFileError] = useState(null);
   const [formData, setFormData] = useState({});
+  const [updateSuccess,setUpdateSuccess]=useState(false);
+  const dispatch = useDispatch();
 
   const handleFileupload = (file) => {
     const storage = getStorage(app);
@@ -47,10 +55,37 @@ function Profile() {
     }
   }, [file]);
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(updateUserFailure(data.message));
+      } else {
+        dispatch(updateUserSuccess(data));
+        setUpdateSuccess(true);
+      }
+    } catch (e) {
+      dispatch(updateUserFailure(e.message));
+    }
+  }
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input
           type="file"
           onChange={(e) => setFile(e.target.files[0])}
@@ -80,36 +115,38 @@ function Profile() {
         <input
           type="text"
           id="username"
-          value={currentUser.username}
-          className="border p-3 rounded-lg "
+          className="border p-3 rounded-lg outline-none"
+          defaultValue={currentUser.username}
+          onChange={handleChange}
         />
         <input
           type="text"
           id="email"
-          value={currentUser.email}
-          className="border p-3 rounded-lg "
+          className="border p-3 rounded-lg outline-none"
+          defaultValue={currentUser.email}
+          onChange={handleChange}
         />
-        <input type="text" id="password" className="border p-3 rounded-lg " />
-        <button className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
-          Update
+        <input type="password"
+          id="password"
+          className="border p-3 rounded-lg outline-none"
+          placeholder="Password"
+          onChange={handleChange}
+        />
+        <button
+          className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
+          disabled={loading}
+        >
+          {loading ? 'Updating...' : 'Update'}
         </button>
       </form>
       <div className="text-red-700 flex justify-between">
         <Link>Delete Account</Link>
         <Link>Sign Out</Link>
       </div>
+      <p className="text-red-700 mt-5">{error?error:''}</p>
+      <p className="text-green-700 mt-5">{updateSuccess? 'Account has been updated Successfully!!': ''}</p>
     </div>
   );
 }
 
 export default Profile;
-
-// {
-//   "_id": "6717a1e07b0616c7efa9a1f5",
-//   "username": "user1",
-//   "email": "user1@gmail.com",
-//   "avatar": "https://img.freepik.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-854.jpg?t=st=1729601677~exp=1729605277~hmac=7c44fbdaf3ebd9e7103c537760594ca8f10888532e1aa0a4bfaedadf3810c661&w=740",
-//   "createdAt": "2024-10-22T13:00:16.754Z",
-//   "updatedAt": "2024-10-22T13:00:16.754Z",
-//   "__v": 0
-// }
