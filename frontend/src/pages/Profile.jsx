@@ -11,7 +11,10 @@ import { app } from "../firebase";
 import {
   updateUserFailure,
   updateUserStart,
-  updateUserSuccess
+  updateUserSuccess,
+  deleteUserFailure,
+  deleteUserSuccess,
+  deleteUserStart
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 
@@ -82,6 +85,24 @@ function Profile() {
     }
   }
 
+  const handleDelete=async (e)=>{
+    e.preventDefault();
+    try {
+      dispatch(deleteUserStart());
+      const response=await fetch(`/api/user/delete/${currentUser._id}`,{
+        method: 'DELETE',
+      });
+      const data=await response.json();
+      if(data.success===false){
+        dispatch(deleteUserFailure(data.message));
+      } else {
+        dispatch(deleteUserSuccess());
+      }
+    } catch (error) {
+      dispatch(deleteUserFailure(error));
+    }
+  }
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -140,8 +161,8 @@ function Profile() {
         </button>
       </form>
       <div className="text-red-700 flex justify-between">
-        <Link>Delete Account</Link>
-        <Link>Sign Out</Link>
+        <button onClick={handleDelete}>Delete Account</button>
+        <button>Sign Out</button>
       </div>
       <p className="text-red-700 mt-5">{error?error:''}</p>
       <p className="text-green-700 mt-5">{updateSuccess? 'Account has been updated Successfully!!': ''}</p>

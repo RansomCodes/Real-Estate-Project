@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { signInStart,signInFailure,signInSuccess } from "../redux/user/userSlice";
+import { signInStart,signInFailure,signInSuccess,clearError } from "../redux/user/userSlice";
 import Oauth from "../components/Oauth";
 
 function Signin() {
   const [formData, setFormData] = useState({});
-  const {loading, error}=useSelector((state)=>state.user);
+  const {loading, error}=useSelector((state)=>state.user.user);
 
   const dispatch=useDispatch();
   const Navigate = useNavigate();
@@ -30,7 +30,6 @@ function Signin() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      console.log(data);
       if (data.success === false) {
         dispatch(signInFailure(data.message));
         return;
@@ -41,6 +40,10 @@ function Signin() {
       dispatch(signInFailure(e.message));
     }
   };
+
+    useEffect(()=>{
+      dispatch(clearError());
+    },[])
 
   return (
     <div className="p-3">
@@ -55,7 +58,7 @@ function Signin() {
             onChange={handleChange}
           />
           <input
-            type="text"
+            type="password"
             placeholder="Password"
             className="border outline-none p-2 rounded-lg"
             id="password"

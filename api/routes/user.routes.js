@@ -1,9 +1,10 @@
 const express=require('express');
 const router=express.Router();
-const userControllers=require('../controllers/user.controller');
+const {test,updateUser,deleteUser}=require('../controllers/user.controller');
 const {verifyToken}=require('../utils/verifyUser')
 
-router.get('/test',userControllers.test);
-router.post('/update/:id',verifyToken,userControllers.updateUser)
+router.get('/test',test);
+router.post('/update/:id',verifyToken,updateUser);
+router.delete('/delete/:id',verifyToken,deleteUser);
 
 module.exports=router;
