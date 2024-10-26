@@ -67,3 +67,12 @@ module.exports.google=async (req,res,next)=>{
         next(error);
     }
 }
+
+module.exports.signout= (req,res,next)=>{
+    try {
+        res.clearCookie('access_token');
+        res.status(200).json('Successfully Logged Out the user');   
+    } catch (error) {
+        next(errorHandler(error));
+    }
+}
